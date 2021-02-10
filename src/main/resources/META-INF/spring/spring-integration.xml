@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder
+            location="classpath:integration-application.properties"/>
+
+    <bean id="messageSource"
+          class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>i18n/application-messages</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="counter" class="java.util.concurrent.atomic.AtomicLong"/>
+
+    <int:channel id="inputChannel"/>
+    <int:channel id="outputChannel"/>
+
+    <int:inbound-channel-adapter id="pollingChannelAdapter"
+                                 expression="@counter.incrementAndGet()"
+                                 channel="inputChannel">
+        <int:poller fixed-delay="${application.polling-interval}"/>
+    </int:inbound-channel-adapter>
+
+    <int:transformer id="transformer"
+                     input-channel="inputChannel"
+                     output-channel="outputChannel"
+                     ref="sampleTransformer"
+                     method="transform"/>
+
+    <bean id="sampleTransformer"
+          class="fridge.transformer.SampleTransformer"/>
+
+    <int:logging-channel-adapter id="loggingChannelAdapter"
+                                 channel="outputChannel"
+                                 log-full-message="true"/>
+</beans>

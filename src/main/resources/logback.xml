@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="consoleLog"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy/MM/dd HH:mm:ss}] [%thread] [%-22logger{22}] [%-5level] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="applicationLog"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${app.log.dir:-log}/integration-application.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${app.log.dir:-log}/integration-application-%d{yyyyMMdd}.log
+            </fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>
+                <![CDATA[date:%d{yyyy-MM-dd HH:mm:ss}\tthread:%thread\tlevel:%-5level\tlogger:%-48logger{48}\tmessage:%msg%n]]></pattern>
+        </encoder>
+    </appender>
+
+    <appender name="monitoringLog"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${app.log.dir:-log}/integration-monitoring.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${app.log.dir:-log}/integration-monitoring-%d{yyyyMMdd}.log
+            </fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>
+                <![CDATA[date:%d{yyyy-MM-dd HH:mm:ss}\tlevel:%-5level\tmessage:%msg%n]]></pattern>
+        </encoder>
+    </appender>
+
+    <!-- logger definition for logging-channel-adapter. -->
+    <logger name="org.springframework.integration.handler.LoggingHandler" level="INFO"/>
+    <logger name="org.springframework" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="consoleLog"/>
+        <appender-ref ref="applicationLog"/>
+        <appender-ref ref="monitoringLog"/>
+    </root>
+</configuration>
