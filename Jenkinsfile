@@ -4,6 +4,11 @@ pipeline{
         myvar = "outer block"
     }
     stages{
+        stage('git checkout'){
+            steps{
+                sh 'echo git-checkout'
+            }
+        }
        
       stage('build'){
             steps{
