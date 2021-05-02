@@ -4,6 +4,7 @@ pipeline{
         myvar = "outer block"
     }
     stages{
+       
       stage('build'){
             steps{
             sh "mvn clean install"
