@@ -4,12 +4,7 @@ pipeline{
         myvar = "outer block"
     }
     stages{
-        /*stage('checkout'){
-            steps{
-            git credentialsId: 'pipeline', url: 'https://github.com/rameshcompany/war-1-wm-1.git'
-        }
-        }/*
-        stage('build'){
+      stage('build'){
             steps{
             sh "mvn clean install"
         }
