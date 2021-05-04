@@ -1,0 +1,86 @@
+pipeline{
+    //agent any
+    agent{
+        label 'tom'
+         }
+   // environment{
+     //   myvar = "outer block"
+    //}
+    tools {
+        
+        maven 'maven362'
+        
+        }
+        environment{
+            target_user='ubuntu'
+            target_server='18.234.226.152'
+        }
+    //timestamps {
+    // some block
+  //  sh 'echo attaching timestamps'
+//}
+    
+     options {
+               timestamps ()
+               timeout(10)
+               buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5')
+             }
+
+
+    stages{
+        stage('checkout'){
+                               steps{
+                                      git credentialsId: 'pipeline', url: 'https://github.com/rameshcompany/war-1-wm-1.git'
+                                    }
+                         }
+        stage('build'){
+                                    steps{
+                                          sh "mvn clean install"
+                                           //sh 'echo buiilding'
+                                          }
+                      }
+        stage('test'){
+                               steps{
+                                      sh 'mvn test'
+                                      //junit allowEmptyResults: true ,testResults: 'target/sure-firerepo'
+                                     }
+                      }
+       stage('deploying to dev') {
+                                               steps{
+                                                      echo "deploying to dev environment"
+                                                  sshagent(['kubectl']) {
+                                                                         sh "scp -o StrictHostKeyChecking=no /opt/donkey/workspace/monkey/target/wm-1-0.0.1-SNAPSHOT.war $target_user@$target_server:/opt/random"
+
+                                                                          }
+                                                    }
+                                  }
+        stage('post tasks'){
+                                 steps{
+                                        sh "echo emailing"
+                                      }
+                           }
+        
+         //stage('printing environment var'){
+           // environment{
+               //  myvar = "inner block"
+            // }
+            // steps{
+              //  sh 'echo "this is my var: $myvar"'
+        //    }
+        // }
+    // }
+    //post {
+        
+      //  always{
+        //    deleteDir ()
+        //} 
+     // failure{
+       //     echo "sendmail -s maven job failed recipients@company.com"
+         //    }
+        //success{
+          //  echo "the job is successful"
+            //   }
+    //}
+
+}
+}
